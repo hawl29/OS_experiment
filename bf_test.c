@@ -59,15 +59,15 @@ void show(node *head) //打印内存分配情况
 }
 int add(node *head,int no,int size)  //内存分配模块
 {
-    int min=INF;                     //bf算法首先找到所有大于待分配作业大小的空闲区，再从中找出容量与作业大小最接近的空闲区，完成分配
+    int min=INF;                     //bf算法首先找到所有大于待分配作业大小的空闲区，再从中找出容量最小的空闲区，完成分配
     node *p,*q;
     for(p=head->next;p;p=p->next)
     {  
       if(p->no==-1&&p->size>=size)  //先找满足容量大于作业大小的空闲区
       {
-         if(p->size-size<min)       //再找容量与作业大小最接近的空闲区
+         if(p->size<min)       //再找容量与作业大小最接近的空闲区
          {
-          min=p->size-size;
+          min=p->size;
           q=p;
          }
       } 
@@ -102,10 +102,12 @@ int del(node *head,int no)  //内存回收模块
             m->next=n->next;
             free(n);
             n=m->next; 
-            continue;
         }
-        m=n; 
-        n=n->next;
+        else 
+        {
+          m=n; 
+          n=n->next;
+        }  
      }
      return 1;
 }
