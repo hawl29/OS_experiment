@@ -23,7 +23,7 @@ node* init_link_table()
   scanf("%d", &SIZE);
   return head;
 }
-void show(node *head) /*打印内存分配情况*/
+void show(node *head) //打印内存分配情况
 {
     node *p=head->next,*q=head->next;
     int i=1, j=1;
@@ -31,12 +31,12 @@ void show(node *head) /*打印内存分配情况*/
     printf( "(分区号, 作业, 始址, 大小)    (分区号, 始址, 大小)\n" );
     while(p||q) 
     {
-        while(p&&p->no==-1)
+        while(p&&p->no==-1)                //查找已分配分区的分区号
         {
           p=p->next;
           i++; 
         }
-        while(q&&q->no!=-1) 
+        while(q&&q->no!=-1)                //查找空闲分区的分区号
        { 
           q=q->next; 
           j++;
@@ -57,36 +57,36 @@ void show(node *head) /*打印内存分配情况*/
        printf("\n");
     }
 }
-int add(node *head,int no,int size)  /*内存分配模块*/
+int add(node *head,int no,int size)  //内存分配模块
 {
-    int min=INF;
+    int min=INF;                     //bf算法首先找到所有大于待分配作业大小的空闲区，再从中找出容量与作业大小最接近的空闲区，完成分配
     node *p,*q;
     for(p=head->next;p;p=p->next)
     {  
-      if(p->no==-1&&p->size>=size)
+      if(p->no==-1&&p->size>=size)  //先找满足容量大于作业大小的空闲区
       {
-         if(p->size-size<min)
+         if(p->size-size<min)       //再找容量与作业大小最接近的空闲区
          {
           min=p->size-size;
           q=p;
          }
       } 
     } 
-    if(q==NULL) return 0;
-    if(q->size-size>SIZE) 
+    if(q==NULL) return 0;         //如果没找到满足要求的空闲区，则分配失败
+    if(q->size-size>SIZE)          //SIZE是我们设置的碎片大小，若分配后空闲区剩余空间容量大于碎片大小，则需为剩余空间新建一个链表结点来记录它
     {
-       node *temp=(node*)malloc(sizeof(node));
-       temp->no=-1; 
-       temp->start=q->start+size;
-       temp->size=q->size-size;
-       temp->next=q->next;
+       node *temp=(node*)malloc(sizeof(node)); 
+       temp->no=-1;                          
+       temp->start=q->start+size;              //为剩余空间创建新结点，它的始址为该空闲块原始址+作业大小
+       temp->size=q->size-size;                //该结点大小即为原空闲块大小-作业大小
+       temp->next=q->next;                     //将新建结点插入原空闲结点之后
        q->next=temp;
     }  
-    q->no=no;
-    q->size=(q->size-size>SIZE?size:q->size);
+    q->no=no;                     //将作业存入该空闲区中
+    q->size=(q->size-size>SIZE?size:q->size);  //若为剩余空间创建了新结点，则存入作业后，该结点大小即为作业大小
     return 1;
 }
-int del(node *head,int no)  /*内存回收模块*/
+int del(node *head,int no)  //内存回收模块
 {
      node *p,*m,*n;
      p=head->next;
@@ -96,7 +96,7 @@ int del(node *head,int no)  /*内存回收模块*/
      m=head->next;n=m->next;
      while(n) 
      { 
-        if(m->no==-1&&n->no==-1&&m->start+m->size==n->start) /*判断m,n指向相邻块*/
+        if(m->no==-1&&n->no==-1&&m->start+m->size==n->start)    //判断m,n指向相邻块
         { 
             m->size+=n->size; 
             m->next=n->next;
@@ -117,7 +117,7 @@ int main()
     int op,no,size,state;
     printf("\n***************************************************\n");
     printf("   1: 为新作业分配内存        2: 撤销作业释放内存\n");
-    printf("   3: 查看buddy算法内存分配   4: 退出");
+    printf("   3: 查看bf算法内存分配      4: 退出");
     printf("\n***************************************************\n");
     printf("请输入操作: ");
     scanf("%d",&op);
